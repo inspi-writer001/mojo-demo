@@ -18,3 +18,8 @@ cargo run
 when the game window loads up,\
 use arrow keys to move the player aroud the screen \
 ⬆️ ⬇️ ⬅️ ➡️
+
+## 🚨 Gotchas
+
+You'd want to change
+`"moving_game16"` and `"brother_position16"` to something different though since I've already used those.
