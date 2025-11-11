@@ -2967,9 +2967,9 @@ checksum = "135b12329e5e3ce057a9f972339ea52bc954fe1e9358ef27f95e89716fbc5424"
 
 [[package]]
 name = "hyper"
-version = "1.7.0"
+version = "1.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "eb3aa54a13a0dfe7fbe3a59e0c76093041720fdc77b110cc0fc260fafb4dc51e"
+checksum = "1744436df46f0bde35af3eda22aeaba453aada65d8f1c171cd8a5f59030bd69f"
 dependencies = [
  "atomic-waker",
  "bytes",
@@ -3647,7 +3647,7 @@ dependencies = [
 [[package]]
 name = "mojo-rust-sdk"
 version = "0.1.0"
-source = "git+https://github.com/inspi-writer001/mojo-rust-sdk-v0#c27f7a20696739d17c5ab8742a2858d873bd73e3"
+source = "git+https://github.com/inspi-writer001/mojo-rust-sdk-v0#0b795febe4dd2680ad00cd1c114e61556afc71d3"
 dependencies = [
  "anyhow",
  "borsh 1.5.7",
