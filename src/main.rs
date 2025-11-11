@@ -27,12 +27,16 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 
     let rpc_client = WorldClient::new("https://api.devnet.solana.com");
 
-    let new_world = World::create_world(&rpc_client, &payer, "moving_game1");
+    let new_world = World::create_world(&rpc_client, &payer, "moving_game5");
     println!("we got world yayy, {}", new_world.unwrap());
 
     let player_position = MyPosition { x: 0.0, y: 0.0 };
-    let new_player =
-        World::create::<MyPosition>(&rpc_client, &payer, "brother_position", &player_position);
+    let new_player = World::create_state::<MyPosition>(
+        &rpc_client,
+        &payer,
+        "brother_positio4",
+        &player_position,
+    );
     println!(
         "we just spawned a character position, {}",
         new_player.unwrap()
