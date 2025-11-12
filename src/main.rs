@@ -37,11 +37,13 @@ struct ErClient(WorldClient);
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     let payer = read_keypair_file("dev_wallet-keypair.json").expect("Couldn't find wallet file");
 
-    let rpc_client = WorldClient::new("https://api.devnet.solana.com");
-    let er_rpc_client = WorldClient::new("https://devnet.magicblock.app/");
+    let rpc_client = WorldClient::new(
+        "https://devnet.helius-rpc.com/?api-key=f196b10a-2a64-4a34-a50b-c35637262f9e",
+    );
+    let er_rpc_client = WorldClient::new("https://devnet-eu.magicblock.app/");
 
-    let new_world = World::create_world(&rpc_client, &payer, "moving_game16");
-    let state_name = "brother_position16";
+    let new_world = World::create_world(&rpc_client, &payer, "moving_game3");
+    let state_name = "brother_position3";
     println!("we got world yayy, {}", new_world.unwrap());
 
     let player_position = MyPosition { x: 0.0, y: 0.0 };
