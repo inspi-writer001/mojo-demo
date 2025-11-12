@@ -38,8 +38,8 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     let rpc_client = WorldClient::new("https://api.devnet.solana.com");
     let er_rpc_client = WorldClient::new("https://devnet-eu.magicblock.app/");
 
-    let new_world = World::create_world(&rpc_client, &payer, "moving_game7");
-    let state_name = "brother_position7";
+    let new_world = World::create_world(&rpc_client, &payer, "moving_game8");
+    let state_name = "brother_position8";
     println!("we got world yayy, {}", new_world.unwrap());
 
     let player_position = MyPosition { x: 0.0, y: 0.0 };
