@@ -34,16 +34,17 @@ struct PlayerPosition(MyPosition);
 #[derive(Resource)]
 struct ErClient(WorldClient);
 
+#[derive(Resource)]
+struct LastMoveTimer(Timer);
+
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     let payer = read_keypair_file("dev_wallet-keypair.json").expect("Couldn't find wallet file");
 
-    let rpc_client = WorldClient::new(
-        "https://devnet.helius-rpc.com/?api-key=f196b10a-2a64-4a34-a50b-c35637262f9e",
-    );
+    let rpc_client = WorldClient::new("https://api.devnet.solana.com");
     let er_rpc_client = WorldClient::new("https://devnet-eu.magicblock.app/");
 
-    let new_world = World::create_world(&rpc_client, &payer, "moving_game4");
-    let state_name = "brother_position4";
+    let new_world = World::create_world(&rpc_client, &payer, "moving_game6");
+    let state_name = "brother_position6";
     println!("we got world yayy, {}", new_world.unwrap());
 
     let player_position = MyPosition { x: 0.0, y: 0.0 };
@@ -59,6 +60,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.insert_resource(PlayerStateName(state_name.to_string()));
     commands.insert_resource(PlayerPosition(player_position));
     commands.insert_resource(ErClient(er_rpc_client));
+    commands.insert_resource(LastMoveTimer(Timer::from_seconds(3.0, TimerMode::Once)));
 
     commands.spawn(Camera2dBundle {
         camera_2d: Camera2d {
@@ -86,44 +88,47 @@ fn character_movement(
     keypair: Res<PlayerKeypair>,
     state_name: Res<PlayerStateName>,
     mut player_position: ResMut<PlayerPosition>,
+    mut last_move_timer: ResMut<LastMoveTimer>,
     rpc_client: Res<ErClient>,
 ) {
+    let mut has_moved = false;
     for (mut transform, _) in &mut characters {
-        // do the state update here on character movement
+        // Update local state IMMEDIATELY for smooth gameplay
         if input.pressed(KeyCode::Up) {
             transform.translation.y += 100.0 * time.delta_seconds();
             player_position.0.y += 100.0 * time.delta_seconds();
-            let hash =
-                World::write_state(&rpc_client.0, &keypair.0, &state_name.0, &player_position.0)
-                    .expect("failed to send tx in ER");
-            println!("we just moved a character position, {}", hash);
+            has_moved = true;
         }
         if input.pressed(KeyCode::Down) {
             transform.translation.y -= 100.0 * time.delta_seconds();
             player_position.0.y -= 100.0 * time.delta_seconds();
-            let hash =
-                World::write_state(&rpc_client.0, &keypair.0, &state_name.0, &player_position.0)
-                    .expect("failed to send tx in ER");
-
-            println!("we just moved a character position, {}", hash);
+            has_moved = true;
         }
         if input.pressed(KeyCode::Right) {
             transform.translation.x += 100.0 * time.delta_seconds();
             player_position.0.x += 100.0 * time.delta_seconds();
-            let hash =
-                World::write_state(&rpc_client.0, &keypair.0, &state_name.0, &player_position.0)
-                    .expect("failed to send tx in ER");
-
-            println!("we just moved a character position, {}", hash);
+            has_moved = true;
         }
         if input.pressed(KeyCode::Left) {
             transform.translation.x -= 100.0 * time.delta_seconds();
             player_position.0.x -= 100.0 * time.delta_seconds();
-            let hash =
-                World::write_state(&rpc_client.0, &keypair.0, &state_name.0, &player_position.0)
-                    .expect("failed to send tx in ER");
+            has_moved = true;
+        }
+    }
 
-            println!("we just moved a character position, {}", hash);
+    // If player moved, reset the timer
+    if has_moved {
+        last_move_timer.0.reset();
+    }
+
+    // Tick the timer (only counts up when player is NOT moving)
+    last_move_timer.0.tick(time.delta());
+
+    // After 3 seconds of NO movement, send to MagicBlock
+    if last_move_timer.0.just_finished() {
+        match World::write_state(&rpc_client.0, &keypair.0, &state_name.0, &player_position.0) {
+            Ok(hash) => println!("Synced position to ER after inactivity: {}", hash),
+            Err(e) => eprintln!("Failed to sync to ER: {}", e),
         }
     }
 }
