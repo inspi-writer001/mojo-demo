@@ -42,8 +42,8 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     );
     let er_rpc_client = WorldClient::new("https://devnet-eu.magicblock.app/");
 
-    let new_world = World::create_world(&rpc_client, &payer, "moving_game3");
-    let state_name = "brother_position3";
+    let new_world = World::create_world(&rpc_client, &payer, "moving_game4");
+    let state_name = "brother_position4";
     println!("we got world yayy, {}", new_world.unwrap());
 
     let player_position = MyPosition { x: 0.0, y: 0.0 };
@@ -93,26 +93,37 @@ fn character_movement(
         if input.pressed(KeyCode::Up) {
             transform.translation.y += 100.0 * time.delta_seconds();
             player_position.0.y += 100.0 * time.delta_seconds();
-            World::write_state(&rpc_client.0, &keypair.0, &state_name.0, &player_position.0)
-                .expect("failed to send tx in ER");
+            let hash =
+                World::write_state(&rpc_client.0, &keypair.0, &state_name.0, &player_position.0)
+                    .expect("failed to send tx in ER");
+            println!("we just moved a character position, {}", hash);
         }
         if input.pressed(KeyCode::Down) {
             transform.translation.y -= 100.0 * time.delta_seconds();
             player_position.0.y -= 100.0 * time.delta_seconds();
-            World::write_state(&rpc_client.0, &keypair.0, &state_name.0, &player_position.0)
-                .expect("failed to send tx in ER");
+            let hash =
+                World::write_state(&rpc_client.0, &keypair.0, &state_name.0, &player_position.0)
+                    .expect("failed to send tx in ER");
+
+            println!("we just moved a character position, {}", hash);
         }
         if input.pressed(KeyCode::Right) {
             transform.translation.x += 100.0 * time.delta_seconds();
             player_position.0.x += 100.0 * time.delta_seconds();
-            World::write_state(&rpc_client.0, &keypair.0, &state_name.0, &player_position.0)
-                .expect("failed to send tx in ER");
+            let hash =
+                World::write_state(&rpc_client.0, &keypair.0, &state_name.0, &player_position.0)
+                    .expect("failed to send tx in ER");
+
+            println!("we just moved a character position, {}", hash);
         }
         if input.pressed(KeyCode::Left) {
             transform.translation.x -= 100.0 * time.delta_seconds();
             player_position.0.x -= 100.0 * time.delta_seconds();
-            World::write_state(&rpc_client.0, &keypair.0, &state_name.0, &player_position.0)
-                .expect("failed to send tx in ER");
+            let hash =
+                World::write_state(&rpc_client.0, &keypair.0, &state_name.0, &player_position.0)
+                    .expect("failed to send tx in ER");
+
+            println!("we just moved a character position, {}", hash);
         }
     }
 }

@@ -3647,7 +3647,7 @@ dependencies = [
 [[package]]
 name = "mojo-rust-sdk"
 version = "0.1.0"
-source = "git+https://github.com/inspi-writer001/mojo-rust-sdk-v0#ebe66150a035be3a19a9d32fee66467960a8c2d4"
+source = "git+https://github.com/inspi-writer001/mojo-rust-sdk-v0#35cb52be2b969d59176185abc53ed3cbef3d5c3b"
 dependencies = [
  "anyhow",
  "borsh 1.5.7",
