@@ -11,6 +11,6 @@ opt-level = 3
 
 [dependencies]
 bevy = { version = "0.11", features = ["dynamic_linking"] }
-mojo-rust-sdk = { git = "https://github.com/inspi-writer001/mojo-rust-sdk-v0" }
+mojo-rust-sdk = { git = "https://github.com/inspi-writer001/mojo-rust-sdk-v0", branch = "inspiration-cleanup" }
 solana-keypair = "2.2.1"
 bytemuck = { version = "1.15", features = ["derive"] }

@@ -11,8 +11,5 @@ pub struct GameState {
     pub health_state_name: String,
     pub position: MyPosition,
     pub health: MyHealth,
-    pub rpc_client: WorldClient,
-    pub er_client: WorldClient,
     pub last_sync_timer: Timer,
 }
-
