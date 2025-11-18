@@ -1,4 +1,5 @@
 use bevy::{app::AppExit, core_pipeline::clear_color::ClearColorConfig, prelude::*};
+use mojo_rust_sdk::client::RpcType;
 use mojo_rust_sdk::world::World;
 use solana_keypair::read_keypair_file;
 
@@ -10,16 +11,14 @@ use crate::types::{MyHealth, MyPosition};
 pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     let payer = read_keypair_file("dev_wallet-keypair.json").expect("Couldn't find wallet file");
 
-    let rpc_client = mojo_rust_sdk::client::WorldClient::new("https://api.devnet.solana.com");
-    let er_rpc_client = mojo_rust_sdk::client::WorldClient::new("https://devnet-eu.magicblock.app/");
-
-    let new_world = World::create_world(&rpc_client, &payer, "moving_game8123");
-    let position_state_name = "brother_position8123";
+    let new_world = World::create_world(RpcType::Devnet, &payer, "moving_game703");
+    let position_state_name = "brother_position703";
+    let health_state_name = "brother_health703";
     println!("we got world yayy, {}", new_world.unwrap());
 
     let player_position = MyPosition { x: 0.0, y: 0.0 };
     let new_player = World::create_state::<MyPosition>(
-        &rpc_client,
+        RpcType::Devnet,
         &payer,
         &position_state_name,
         &player_position,
@@ -29,10 +28,13 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         new_player.unwrap()
     );
 
-    let health_state_name = "brother_health8123";
     let initial_health = MyHealth { health: 1000 };
-    let new_health_state =
-        World::create_state::<MyHealth>(&rpc_client, &payer, &health_state_name, &initial_health);
+    let new_health_state = World::create_state::<MyHealth>(
+        RpcType::Devnet,
+        &payer,
+        &health_state_name,
+        &initial_health,
+    );
     println!("Created health state: {}", new_health_state.unwrap());
 
     commands.insert_resource(GameState {
@@ -41,9 +43,8 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         health_state_name: health_state_name.to_string(),
         position: player_position,
         health: initial_health,
-        rpc_client,
-        er_client: er_rpc_client,
-        last_sync_timer: Timer::from_seconds(2.0, TimerMode::Once),
+
+        last_sync_timer: Timer::from_seconds(5.0, TimerMode::Once),
     });
 
     commands.spawn(Camera2dBundle {
@@ -153,7 +154,7 @@ pub fn character_movement(
 
     if game_state.last_sync_timer.just_finished() {
         match World::write_state(
-            &game_state.er_client,
+            RpcType::Devnet,
             &game_state.keypair,
             &game_state.position_state_name,
             &game_state.position,
@@ -163,7 +164,7 @@ pub fn character_movement(
         }
 
         match World::write_state(
-            &game_state.er_client,
+            RpcType::Devnet,
             &game_state.keypair,
             &game_state.health_state_name,
             &game_state.health,
@@ -365,4 +366,3 @@ pub fn handle_game_over_buttons(
         }
     }
 }
-
