@@ -2,6 +2,7 @@ use bevy::{app::AppExit, core_pipeline::clear_color::ClearColorConfig, prelude::
 use mojo_rust_sdk::client::RpcType;
 use mojo_rust_sdk::world::World;
 use solana_keypair::read_keypair_file;
+use solana_signer::Signer;
 
 use crate::components::{GameOverButton, GameOverUI, Health, HealthBarFill, Player};
 use crate::resources::GameState;
@@ -11,34 +12,27 @@ use crate::types::{MyHealth, MyPosition};
 pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     let payer = read_keypair_file("dev_wallet-keypair.json").expect("Couldn't find wallet file");
 
-    let new_world = World::create_world(RpcType::Devnet, &payer, "moving_game703");
-    let position_state_name = "brother_position703";
-    let health_state_name = "brother_health703";
-    println!("we got world yayy, {}", new_world.unwrap());
+    let new_world = World::create_world(RpcType::Devnet, &payer, "summer").unwrap();
+    let position_state_name = "summerposition";
+    let health_state_name = "summer_health";
+    println!("we got world yayy, {:?}", new_world.data.world_address);
 
-    let player_position = MyPosition { x: 0.0, y: 0.0 };
-    let new_player = World::create_state::<MyPosition>(
-        RpcType::Devnet,
-        &payer,
-        &position_state_name,
-        &player_position,
-    );
+    let player_position = MyPosition { x: 1.0, y: 1.0 };
+    let new_player =
+        new_world.create_state::<MyPosition>(&payer, &position_state_name, &player_position);
     println!(
         "we just spawned a character position and delegated, {}",
         new_player.unwrap()
     );
 
     let initial_health = MyHealth { health: 1000 };
-    let new_health_state = World::create_state::<MyHealth>(
-        RpcType::Devnet,
-        &payer,
-        &health_state_name,
-        &initial_health,
-    );
+    let new_health_state =
+        new_world.create_state::<MyHealth>(&payer, &health_state_name, &initial_health);
     println!("Created health state: {}", new_health_state.unwrap());
 
     commands.insert_resource(GameState {
         keypair: payer,
+        world: new_world,
         position_state_name: position_state_name.to_string(),
         health_state_name: health_state_name.to_string(),
         position: player_position,
@@ -153,18 +147,29 @@ pub fn character_movement(
     game_state.last_sync_timer.tick(time.delta());
 
     if game_state.last_sync_timer.just_finished() {
-        match World::write_state(
-            RpcType::Devnet,
+        match game_state.world.write_state(
             &game_state.keypair,
             &game_state.position_state_name,
             &game_state.position,
         ) {
-            Ok(hash) => println!("Synced position to ER: {}", hash),
+            Ok(hash) => {
+                println!("Synced position to ER: {}", hash);
+                let current_state = game_state
+                    .world
+                    .read_state::<MyPosition>(
+                        &game_state.keypair.pubkey(),
+                        &game_state.position_state_name,
+                    )
+                    .unwrap();
+                println!(
+                    "here's the state x: {}, y: {}",
+                    current_state.x, current_state.y
+                );
+            }
             Err(e) => eprintln!("Failed to sync position: {}", e),
         }
 
-        match World::write_state(
-            RpcType::Devnet,
+        match game_state.world.write_state(
             &game_state.keypair,
             &game_state.health_state_name,
             &game_state.health,

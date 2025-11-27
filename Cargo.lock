@@ -3647,7 +3647,7 @@ dependencies = [
 [[package]]
 name = "mojo-rust-sdk"
 version = "0.1.0"
-source = "git+https://github.com/inspi-writer001/mojo-rust-sdk-v0?branch=inspiration-cleanup#22c04612ab45f80d4a37c166a2690cc4fdfbd67e"
+source = "git+https://github.com/inspi-writer001/mojo-rust-sdk-v0?branch=inspiration-cleanup#a85f34f449f079a99f5846d3d1c89db573728b4f"
 dependencies = [
  "anyhow",
  "borsh 1.5.7",
@@ -3679,6 +3679,7 @@ dependencies = [
  "bytemuck",
  "mojo-rust-sdk",
  "solana-keypair",
+ "solana-signer",
 ]
 
 [[package]]
